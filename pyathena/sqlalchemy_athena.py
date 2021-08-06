@@ -3,6 +3,7 @@ import math
 import numbers
 import re
 from distutils.util import strtobool
+from typing import Dict
 
 import botocore
 from sqlalchemy import exc, schema, util
@@ -29,6 +30,29 @@ from sqlalchemy.sql.sqltypes import (
 )
 
 import pyathena
+
+COMPRESSION_TBLPROPERTY_KEY = {
+    "textfile": "compressionType",
+    "parquet": "parquet.compress",
+    "json": "compressionType",
+}
+
+
+def _format_tblproperties(properties: Dict[str, str]) -> str:
+    """
+    Example:
+        >>> print(_format_tblproperties({'a': 'b'}))
+        TBLPROPERTIES (
+            'a'='b'
+        )
+        >>> print(_format_tblproperties({'a': 'b', 'c': 'd'}))
+        TBLPROPERTIES (
+            'a'='b',
+            'c'='d'
+        )
+    """
+    s = ",\n    ".join([f"'{k}'='{v}'" for k, v in properties.items()])
+    return f"TBLPROPERTIES (\n    {s}\n)"
 
 
 class UniversalSet(object):
@@ -259,7 +283,14 @@ class AthenaDDLCompiler(DDLCompiler):
             text += "PARTITIONED BY (" + partition_columns_specs + "\n)\n"
 
         # TODO Supports orc, avro, json, csv or tsv format
-        text += "STORED AS PARQUET\n"
+        stored_as = dialect_opts["stored_as"]
+        if not stored_as:
+            stored_as = "PARQUET"
+        text += f"STORED AS {stored_as}\n"
+
+        row_format = dialect_opts["row_format"]
+        if row_format:
+            text += f"ROW FORMAT {row_format}\n"
 
         if dialect_opts["location"]:
             location = dialect_opts["location"]
@@ -287,6 +318,7 @@ class AthenaDDLCompiler(DDLCompiler):
                 )
         text += f"LOCATION '{location}'\n"
 
+        tblproperties = dialect_opts["tblproperties"] or dict()
         if dialect_opts["compression"]:
             compression = dialect_opts["compression"]
         elif raw_connection:
@@ -295,9 +327,11 @@ class AthenaDDLCompiler(DDLCompiler):
         else:
             compression = None
         if compression:
-            text += "TBLPROPERTIES ('parquet.compress'='{0}')\n".format(
-                compression.upper()
-            )
+            compression_key = COMPRESSION_TBLPROPERTY_KEY[stored_as.lower()]
+            tblproperties[compression_key] = compression.upper()
+
+        if tblproperties:
+            text += _format_tblproperties(tblproperties) + "\n"
 
         return text
 
@@ -358,8 +392,11 @@ class AthenaDialect(DefaultDialect):
         (
             schema.Table,
             {
-                "location": None,
                 "compression": None,
+                "location": None,
+                "row_format": None,
+                "stored_as": None,
+                "tblproperties": None,
             },
         ),
     ]

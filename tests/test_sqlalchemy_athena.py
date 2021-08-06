@@ -604,7 +604,9 @@ class TestSQLAlchemyAthena(unittest.TestCase):
                 )
                 STORED AS PARQUET
                 LOCATION 's3://path/to/test_schema/test_create_table_location/'
-                TBLPROPERTIES ('parquet.compress'='SNAPPY')\n\n
+                TBLPROPERTIES (
+                    'parquet.compress'='SNAPPY'
+                )\n\n
                 """
             ),
         )
@@ -642,7 +644,9 @@ class TestSQLAlchemyAthena(unittest.TestCase):
                 )
                 STORED AS PARQUET
                 LOCATION 's3://path/to/test_schema/test_create_table_with_partition/'
-                TBLPROPERTIES ('parquet.compress'='SNAPPY')\n\n
+                TBLPROPERTIES (
+                    'parquet.compress'='SNAPPY'
+                )\n\n
                 """
             ),
         )

@@ -254,16 +254,7 @@ class AthenaDDLCompiler(DDLCompiler):
         text = "\nCREATE EXTERNAL "
         text += "TABLE " + preparer.format_table(table) + " ("
 
-        separator = "\n"
         text += self._get_columns_specs(create)
-
-        const = self.create_table_constraints(
-            table,
-            _include_foreign_key_constraints=create.include_foreign_key_constraints,
-        )
-        if const:
-            text += separator + "\t" + const
-
         text += "\n)\n%s\n\n" % self.post_create_table(create)
         return text
 

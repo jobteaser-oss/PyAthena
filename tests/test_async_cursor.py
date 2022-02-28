@@ -9,7 +9,7 @@ from pyathena.async_cursor import AsyncCursor, AsyncDictCursor
 from pyathena.error import NotSupportedError, ProgrammingError
 from pyathena.model import AthenaQueryExecution
 from pyathena.result_set import AthenaResultSet
-from tests import WithConnect
+from tests import ENV, WithConnect
 from tests.conftest import SCHEMA
 from tests.util import with_cursor
 
@@ -129,7 +129,7 @@ class TestAsyncCursor(unittest.TestCase, WithConnect):
         self.assertIsNotNone(query_execution.output_location)
         self.assertIsNone(query_execution.encryption_option)
         self.assertIsNone(query_execution.kms_key)
-        self.assertEqual(query_execution.work_group, "primary")
+        self.assertEqual(query_execution.work_group, ENV.work_group)
 
         self.assertEqual(result_set.database, query_execution.database)
         self.assertEqual(result_set.query_id, query_execution.query_id)

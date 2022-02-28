@@ -55,7 +55,7 @@ class TestCursor(unittest.TestCase, WithConnect):
         self.assertIsNone(cursor.data_manifest_location)
         self.assertIsNone(cursor.encryption_option)
         self.assertIsNone(cursor.kms_key)
-        self.assertEqual(cursor.work_group, "primary")
+        self.assertEqual(cursor.work_group, ENV.work_group)
 
     @with_cursor()
     def test_fetchmany(self, cursor):
@@ -394,7 +394,9 @@ class TestCursor(unittest.TestCase, WithConnect):
         cursor.execute("SELECT * from one_row")
         self.assertEqual(
             cursor.output_location,
-            "{0}{1}.csv".format(ENV.s3_staging_dir, cursor.query_id),
+            "{0}{1}.csv".format(
+                ENV.work_group_dir or ENV.s3_staging_dir, cursor.query_id
+            ),
         )
 
     @with_cursor()

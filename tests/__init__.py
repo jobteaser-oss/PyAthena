@@ -21,6 +21,8 @@ class Env(object):
         assert (
             self.s3_staging_dir
         ), "Required environment variable `AWS_ATHENA_S3_STAGING_DIR` not found."
+        self.work_group = os.getenv("AWS_ATHENA_WORK_GROUP", "primary")
+        self.work_group_dir = os.getenv("AWS_ATHENA_WORK_GROUP_STAGING_DIR", None)
 
 
 ENV = Env()

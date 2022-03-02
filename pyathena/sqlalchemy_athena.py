@@ -6,7 +6,7 @@ from distutils.util import strtobool
 from typing import Dict
 
 import botocore
-from sqlalchemy import exc, schema, util
+from sqlalchemy import Column, exc, schema, util
 from sqlalchemy.engine import Engine, reflection
 from sqlalchemy.engine.default import DefaultDialect
 from sqlalchemy.exc import NoSuchTableError, OperationalError
@@ -123,6 +123,8 @@ class AthenaTypeCompiler(GenericTypeCompiler):
             }
 
     def visit_INTEGER(self, type_, **kw):
+        if isinstance(kw.get("type_expression", None), Column):
+            return "INT"
         return "INTEGER"
 
     def visit_SMALLINT(self, type_, **kw):

@@ -158,9 +158,23 @@ class AthenaTypeCompiler(GenericTypeCompiler):
         return self._render_string_type(type_, "CHAR")
 
     def visit_VARCHAR(self, type_, **kw):
+        column = kw.get("type_expression", None)
+        if isinstance(kw.get("type_expression", None), Column) and not type_.length:
+            raise exc.CompileError(
+                f'Column "{column.name}" is of type "String" but has no length. '
+                'Athena does not support "String" (SQL type VARCHAR) without length. '
+                'You must either provide one or use the type "Text" (SQL type STRING)'
+            )
         return self._render_string_type(type_, "VARCHAR")
 
     def visit_NVARCHAR(self, type_, **kw):
+        column = kw.get("type_expression", None)
+        if isinstance(column, Column) and not type_.length:
+            raise exc.CompileError(
+                f'Column "{column.name}" is of type "String" but has no length. '
+                'Athena does not support "String" (SQL type VARCHAR) without length. '
+                'You must either provide one or use the type "Text" (SQL type STRING)'
+            )
         return self._render_string_type(type_, "VARCHAR")
 
     def visit_TEXT(self, type_, **kw):

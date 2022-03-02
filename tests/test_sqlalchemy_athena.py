@@ -588,7 +588,7 @@ class TestSQLAlchemyAthena(unittest.TestCase):
         table = Table(
             "test_create_table_location",
             MetaData(),
-            Column("column_name", String),
+            Column("column_name", String(length=100)),
             schema="test_schema",
             awsathena_location="s3://path/to/test_schema/test_create_table_location",
             awsathena_compression="SNAPPY",
@@ -600,7 +600,7 @@ class TestSQLAlchemyAthena(unittest.TestCase):
             textwrap.dedent(
                 """
                 CREATE EXTERNAL TABLE test_schema.test_create_table_location (
-                \tcolumn_name VARCHAR
+                \tcolumn_name VARCHAR(100)
                 )
                 STORED AS PARQUET
                 LOCATION 's3://path/to/test_schema/test_create_table_location/'
@@ -619,7 +619,7 @@ class TestSQLAlchemyAthena(unittest.TestCase):
         table = Table(
             "test_create_table_with_partition",
             MetaData(),
-            Column("column_name", String),
+            Column("column_name", String(length=100)),
             Column(
                 "dt",
                 Date,
@@ -637,7 +637,7 @@ class TestSQLAlchemyAthena(unittest.TestCase):
             textwrap.dedent(
                 """
                 CREATE EXTERNAL TABLE test_schema.test_create_table_with_partition (
-                \tcolumn_name VARCHAR
+                \tcolumn_name VARCHAR(100)
                 )
                 PARTITIONED BY (
                 \tdt DATE COMMENT 'Daily partitioning of the table'
@@ -650,6 +650,19 @@ class TestSQLAlchemyAthena(unittest.TestCase):
                 """
             ),
         )
+
+    def test_create_table_raises_when_varchar_has_no_length(self):
+        dialect = AthenaDialect()
+        table = Table(
+            "test_create_table_location",
+            MetaData(),
+            Column("column_name", String),
+            schema="test_schema",
+            awsathena_location="s3://path/to/test_schema/test_create_table_location",
+            awsathena_compression="SNAPPY",
+        )
+        with self.assertRaises(sqlalchemy.exc.CompileError):
+            CreateTable(table).compile(dialect=dialect)
 
     @with_engine()
     def test_partitioned_table_introspection(self, engine, conn):

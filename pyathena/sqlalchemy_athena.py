@@ -26,6 +26,7 @@ from sqlalchemy.sql.sqltypes import (
     INTEGER,
     NULLTYPE,
     STRINGTYPE,
+    TEXT,
     TIMESTAMP,
 )
 
@@ -368,7 +369,7 @@ _TYPE_MAPPINGS = {
     "map": STRINGTYPE,
     "date": DATE,
     "timestamp": TIMESTAMP,
-    "string": STRINGTYPE,
+    "string": TEXT,
 }
 
 

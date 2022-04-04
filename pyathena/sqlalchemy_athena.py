@@ -294,15 +294,15 @@ class AthenaDDLCompiler(DDLCompiler):
         if partition_columns_specs:
             text += "PARTITIONED BY (" + partition_columns_specs + "\n)\n"
 
+        row_format = dialect_opts["row_format"]
+        if row_format:
+            text += f"ROW FORMAT {row_format}\n"
+
         # TODO Supports orc, avro, json, csv or tsv format
         stored_as = dialect_opts["stored_as"]
         if not stored_as:
             stored_as = "PARQUET"
         text += f"STORED AS {stored_as}\n"
-
-        row_format = dialect_opts["row_format"]
-        if row_format:
-            text += f"ROW FORMAT {row_format}\n"
 
         if dialect_opts["location"]:
             location = dialect_opts["location"]

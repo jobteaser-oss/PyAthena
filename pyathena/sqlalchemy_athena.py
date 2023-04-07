@@ -103,8 +103,6 @@ class AthenaStatementCompiler(SQLCompiler):
 
 
 class AthenaTypeCompiler(GenericTypeCompiler):
-    def visit_FLOAT(self, type_, **kw):
-        return self.visit_REAL(type_, **kw)
 
     def visit_REAL(self, type_, **kw):
         return "DOUBLE"

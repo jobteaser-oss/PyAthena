@@ -33,7 +33,7 @@ class AthenaTimestamp(TypeEngine[datetime]):
 
 
 class DOUBLE(Float):  # type: ignore
-    __visit_name__ = "double"
+    __visit_name__ = "DOUBLE"
 
 
 class AthenaDate(TypeEngine[date]):

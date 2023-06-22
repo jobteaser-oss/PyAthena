@@ -745,7 +745,9 @@ class AthenaDDLCompiler(DDLCompiler):
         return "\n".join(text)
 
     def get_column_specification(self, column: "Column[Any]", **kwargs) -> str:
-        if isinstance(column.type, (types.Integer, types.INTEGER, types.INT)):
+        if isinstance(column.type, types.Integer) and not isinstance(
+            column.type, (types.SmallInteger, types.BigInteger)
+        ):
             # https://docs.aws.amazon.com/athena/latest/ug/create-table.html
             # In Data Definition Language (DDL) queries like CREATE TABLE,
             # use the int keyword to represent an integer

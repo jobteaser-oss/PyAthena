@@ -10,8 +10,8 @@ import sqlalchemy
 from sqlalchemy.sql.sqltypes import Float, Indexable
 from sqlalchemy.sql.type_api import TypeEngine, UserDefinedType
 
-from pyathena.sqlalchemy import base
-from pyathena.sqlalchemy.constants import sqlalchemy_1_4_or_more
+from . import base
+from .constants import sqlalchemy_1_4_or_more
 
 if TYPE_CHECKING:
     from sqlalchemy import Dialect

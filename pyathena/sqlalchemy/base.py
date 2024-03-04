@@ -34,8 +34,9 @@ from sqlalchemy.sql.compiler import (
 
 import pyathena
 from pyathena.model import AthenaFileFormat, AthenaRowFormatSerde
-from pyathena.sqlalchemy.types import DOUBLE, STRUCT, AthenaDate, AthenaTimestamp
-from pyathena.sqlalchemy.util import _HashableDict
+
+from . import types as athena_types
+from .util import _HashableDict
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -352,7 +353,7 @@ RESERVED_WORDS: Set[str] = set(sorted(DDL_RESERVED_WORDS | SELECT_STATEMENT_RESE
 ischema_names: Dict[str, Type[Any]] = {
     "boolean": types.BOOLEAN,
     "float": types.FLOAT,
-    "double": DOUBLE,
+    "double": athena_types.DOUBLE,
     "real": types.REAL,
     "tinyint": types.INTEGER,
     "smallint": types.INTEGER,
@@ -369,8 +370,8 @@ ischema_names: Dict[str, Type[Any]] = {
     "varbinary": types.BINARY,
     "array": types.ARRAY,
     "map": types.String,
-    "struct": STRUCT,
-    "row": STRUCT,
+    "struct": athena_types.STRUCT,
+    "row": athena_types.STRUCT,
     "json": types.String,
 }
 
@@ -928,9 +929,9 @@ class AthenaDialect(DefaultDialect):
     ]
 
     colspecs = {
-        types.DATE: AthenaDate,
-        types.DATETIME: AthenaTimestamp,
-        types.TIMESTAMP: AthenaTimestamp,
+        types.DATE: athena_types.AthenaDate,
+        types.DATETIME: athena_types.AthenaTimestamp,
+        types.TIMESTAMP: athena_types.AthenaTimestamp,
     }
 
     ischema_names: Dict[str, Type[Any]] = ischema_names
@@ -1132,7 +1133,7 @@ class AthenaDialect(DefaultDialect):
                 args = [int(column_type_args)]
             elif col_type is types.ARRAY:
                 args = [self._get_column_type(column_type_args.strip())]
-            elif col_type is STRUCT:
+            elif col_type is athena_types.STRUCT:
                 args = self._parse_struct(column_type_args)
 
         return col_type(*args)
